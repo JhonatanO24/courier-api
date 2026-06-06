@@ -1,0 +1,56 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: courier_postgres
+    environment:
+      POSTGRES_DB: courier_db
+      POSTGRES_USER: courier_user
+      POSTGRES_PASSWORD: courier_pass
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U courier_user -d courier_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  kafka:
+    image: apache/kafka:3.8.0
+    container_name: courier_kafka
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      # Definimos dos puertos: 9092 para afuera, 29092 para adentro
+      KAFKA_LISTENERS: EXTERNAL://0.0.0.0:9092,INTERNAL://0.0.0.0:29092,CONTROLLER://0.0.0.0:9093
+      # Aquí está el truco: le decimos a cada uno por dónde responder
+      KAFKA_ADVERTISED_LISTENERS: EXTERNAL://localhost:9092,INTERNAL://kafka:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: EXTERNAL:PLAINTEXT,INTERNAL:PLAINTEXT,CONTROLLER:PLAINTEXT
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+    ports:
+      - "9092:9092"
+    healthcheck:
+      test: [ "CMD", "/opt/kafka/bin/kafka-topics.sh", "--bootstrap-server", "localhost:9092", "--list" ]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+
+  kafka-ui:
+      image: provectuslabs/kafka-ui:latest
+      container_name: courier_kafka_ui
+      depends_on:
+        - kafka
+      environment:
+        KAFKA_CLUSTERS_0_NAME: local
+        # Ahora la UI usa el puerto interno 29092
+        KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:29092
+      ports:
+        - "8090:8080"
+
+volumes:
+  postgres_data:

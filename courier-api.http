@@ -1,0 +1,162 @@
+###
+### COURIER API — Colección de pruebas
+###
+
+@baseUrl = http://localhost:8080/api
+@senderId = REEMPLAZA-CON-UUID-SENDER
+@recipientId = REEMPLAZA-CON-UUID-RECIPIENT
+
+###
+### CUSTOMERS
+###
+
+### 1. Crear sender
+POST {{baseUrl}}/customers
+Content-Type: application/json
+
+{
+  "name": "Carlos Sender",
+  "email": "carlos@courier.com",
+  "password": "123456",
+  "role": "SENDER"
+}
+
+### 2. Crear recipient
+POST {{baseUrl}}/customers
+Content-Type: application/json
+
+{
+  "name": "Ana Recipient",
+  "email": "ana@courier.com",
+  "password": "123456",
+  "role": "SENDER"
+}
+
+### 3. Listar customers
+GET {{baseUrl}}/customers
+
+### 4. Buscar customer por ID
+GET {{baseUrl}}/customers/{{senderId}}
+
+### 5. Actualizar customer
+PATCH {{baseUrl}}/customers/{{senderId}}
+Content-Type: application/json
+
+{
+  "name": "Carlos Actualizado",
+  "role": "ADMIN"
+}
+
+### 6. Desactivar customer (soft delete)
+DELETE {{baseUrl}}/customers/{{senderId}}
+
+### 
+### SHIPMENTS — 4 estrategias
+###
+
+### 7. STANDARD — costo 0.1% mín $5000 → DELIVERED
+POST {{baseUrl}}/shipments
+Content-Type: application/json
+
+{
+  "senderId": "{{senderId}}",
+  "recipientId": "{{recipientId}}",
+  "declaredValue": 1000000,
+  "type": "STANDARD",
+  "metadata": {
+    "weightKg": 10
+  }
+}
+
+### 8. EXPRESS — costo $15000 fijo → DELIVERED
+POST {{baseUrl}}/shipments
+Content-Type: application/json
+
+{
+  "senderId": "{{senderId}}",
+  "recipientId": "{{recipientId}}",
+  "declaredValue": 500000,
+  "type": "EXPRESS",
+  "metadata": {
+    "weightKg": 3
+  }
+}
+
+### 9. INTERNATIONAL — costo $50000 + 2% → IN_CUSTOMS
+POST {{baseUrl}}/shipments
+Content-Type: application/json
+
+{
+  "senderId": "{{senderId}}",
+  "recipientId": "{{recipientId}}",
+  "declaredValue": 2000000,
+  "type": "INTERNATIONAL",
+  "metadata": {
+    "destinationCountry": "USA",
+    "customsDeclaration": "Electronics"
+  }
+}
+
+### 10. THIRD_PARTY_CARRIER — costo 5% → DELIVERED
+POST {{baseUrl}}/shipments
+Content-Type: application/json
+
+{
+  "senderId": "{{senderId}}",
+  "recipientId": "{{recipientId}}",
+  "declaredValue": 500000,
+  "type": "THIRD_PARTY_CARRIER",
+  "metadata": {
+    "carrierName": "FedEx",
+    "externalTrackingId": "FX-123456"
+  }
+}
+
+### ----------------------------------------
+### SHIPMENTS — Casos de error
+### ----------------------------------------
+
+### 11. ERROR — EXPRESS peso > 5kg → 400
+POST {{baseUrl}}/shipments
+Content-Type: application/json
+
+{
+  "senderId": "{{senderId}}",
+  "recipientId": "{{recipientId}}",
+  "declaredValue": 500000,
+  "type": "EXPRESS",
+  "metadata": {
+    "weightKg": 10
+  }
+}
+
+### 12. ERROR — INTERNATIONAL sin destinationCountry → 400
+POST {{baseUrl}}/shipments
+Content-Type: application/json
+
+{
+  "senderId": "{{senderId}}",
+  "recipientId": "{{recipientId}}",
+  "declaredValue": 2000000,
+  "type": "INTERNATIONAL",
+  "metadata": {
+    "customsDeclaration": "Electronics"
+  }
+}
+
+### 13. ERROR — Email duplicado → 409
+POST {{baseUrl}}/customers
+Content-Type: application/json
+
+{
+  "name": "Duplicado",
+  "email": "carlos@courier.com",
+  "password": "123456",
+  "role": "SENDER"
+}
+
+### 14. ERROR — Shipment no encontrado → 404
+GET {{baseUrl}}/shipments/00000000-0000-0000-0000-000000000000
+
+### 15. Envíos de un cliente
+GET {{baseUrl}}/shipments/customer/{{senderId}}
