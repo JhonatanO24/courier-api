@@ -14,7 +14,7 @@
 ## 🎯 Objetivo del Proyecto
 
 <em>
-Desarrollo de una API REST robusta para la gestión de servicios de mensajería y paquetería. El proyecto se enfoca en implementar una arquitectura hexagonal (Ports and Adapters) para garantizar un bajo acoplamiento, utilizando patrones de diseño como Strategy para la flexibilidad en modalidades de envío y Observer/Event-Driven mediante Apache Kafka para una comunicación asíncrona y escalable.
+Desarrollo de una API REST robusta para la gestión de servicios de mensajería y paquetería. El proyecto se enfoca en implementar una arquitectura hexagonal (Ports and Adapters) para garantizar un bajo acoplamiento, utilizando patrones de diseño como Strategy para la flexibilidad en modalidades de envío y Observer/Event-Driven mediante Apache Kafka para una comunicación asíncrona y escalable. (Reto Sofka)
 </em>
 
 ---
