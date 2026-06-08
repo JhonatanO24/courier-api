@@ -58,3 +58,32 @@ Uso de PostgreSQL 16 con tipos JSONB para metadata dinámica y transaccionalidad
 ├── 📂 shipments/           → 📦 Lógica de envíos (Patrón Strategy)
 ├── 📂 shared/              → 🔗 Componentes comunes y eventos
 └── 📂 notifications/       → 🔔 Consumidores de eventos (Kafka)
+
+```
+
+---
+
+## ⚙️ Instalación y Ejecución
+
+1️⃣ Clonar el repositorio
+```bash
+git clone https://github.com/JhonatanO24/courier-api.git
+```
+
+2️⃣ Levantar infraestructura (BD + Kafka)
+Utiliza Docker Compose para levantar los servicios necesarios:
+```bash
+docker-compose up -d
+```
+
+3️⃣ Ejecutar la aplicación
+```bash
+./mvnw spring-boot:run
+```
+
+📄 Documentación Interactiva (Swagger)
+Explora y prueba los endpoints de la API directamente desde la interfaz de Swagger UI:
+
+🔗 http://localhost:8080/swagger-ui.html
+
+Desarrollado con pasión por Jhona :)
